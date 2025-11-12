@@ -1,5 +1,5 @@
 # vps_autosetup
-The script automatically performs basic security configuration for your VPS such as:
+The script automatically performs some basic configuration for your VPS such as:
 - Enabling unattended-upgrades, BBR, auto reboot (once a week), sudo logging, 2Gb swap; 
 - Add sudo user, create & upload ssh-key, change SSH port;
 - Disabling IPv6, root login, password authentication;
