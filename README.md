@@ -22,4 +22,7 @@ wget https://raw.githubusercontent.com/vrzdrb/vps_autosetup/main/vps_autosetup.s
 ./vps_autosetup.sh
 ```
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 42501e3f815d439fff1e43a66520afc4469759a4
