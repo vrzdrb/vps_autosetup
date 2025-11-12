@@ -21,6 +21,9 @@ wget https://raw.githubusercontent.com/vrzdrb/vps_autosetup/main/vps_autosetup.s
 ```bash
 ./vps_autosetup.sh
 ```
+<<<<<<< HEAD
 
 ## License
 MIT License - see [LICENSE](LICENSE) file for details
+=======
+>>>>>>> 9b9e0d0b5eb6c35532ee4e3a9722924cd4889b60
