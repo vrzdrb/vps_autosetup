@@ -10,7 +10,7 @@ The script automatically performs some basic configuration for your VPS such as:
 ## Download:
 
 ```bash
-curl -o vps_autosetup.sh https://raw.githubusercontent.com/vrzdrb/vps_autosetup/blob/main/vps_autosetup.sh
+curl -o vps_autosetup.sh https://raw.githubusercontent.com/vrzdrb/vps_autosetup/main/vps_autosetup.sh
 ```
 or
 ```bash
