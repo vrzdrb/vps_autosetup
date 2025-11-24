@@ -19,5 +19,6 @@ wget https://raw.githubusercontent.com/vrzdrb/vps_autosetup/main/vps_autosetup.s
 
 ## Run (from root / sudo):
 ```bash
+chmod +x vps_autosetup.sh
 ./vps_autosetup.sh
 ```
