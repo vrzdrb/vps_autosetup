@@ -8,8 +8,7 @@ The script automatically performs some basic configuration for your VPS such as:
 - Show vps-audit (by https://github.com/vernu/vps-audit).
 
 ## Requirements:
-- Debian Linux on your VPS (or Ubuntu, but Debian is preferable);
-- Any Linux on your local machine (use WSL in Windows https://learn.microsoft.com/ru-ru/windows/wsl/install)
+- Debian Linux on your VPS (or Ubuntu, but Debian is preferable)
 
 ## Download:
 
