@@ -1,23 +1,16 @@
 #!/bin/bash
 
-# ▄   ▄ ▄▄▄▄   ▄▄▄     ▗▞▀▜▌█  ▐▌   ■   ▄▄▄   ▄▄▄ ▗▞▀▚▖   ■  █  ▐▌▄▄▄▄  
-# █   █ █   █ ▀▄▄      ▝▚▄▟▌▀▄▄▞▘▗▄▟▙▄▖█   █ ▀▄▄  ▐▛▀▀▘▗▄▟▙▄▖▀▄▄▞▘█   █ 
-#  ▀▄▀  █▄▄▄▀ ▄▄▄▀                 ▐▌  ▀▄▄▄▀ ▄▄▄▀ ▝▚▄▄▖  ▐▌       █▄▄▄▀ 
-#       █                          ▐▌                    ▐▌       █     
-#       ▀                          ▐▌                    ▐▌       ▀                                                                                                                                                                                                                                                                                                   
+# VPS autosetup
                                                        
 if [ "$(id -u)" != "0" ]; then
-   echo "Этот скрипт должен быть запущен через sudo" 1>&2
+   echo "Этот скрипт должен быть запущен от root" 1>&2
    exit 1
 fi                                                                                          
 apt update
 apt upgrade
 apt install mc git curl wget iptables-persistent chkrootkit rkhunter rsyslog ranger htop tcpdump net-tools nmap dnsutils jq sudo
 
-# ▗▖ ▗▖▗▖  ▗▖ ▗▄▖▗▄▄▄▖▗▄▄▄▖▗▄▄▄▖▗▖  ▗▖▗▄▄▄  ▗▄▄▄▖▗▄▄▄      ▗▖ ▗▖▗▄▄▖  ▗▄▄▖▗▄▄▖  ▗▄▖ ▗▄▄▄  ▗▄▄▄▖ ▗▄▄▖
-# ▐▌ ▐▌▐▛▚▖▐▌▐▌ ▐▌ █    █  ▐▌   ▐▛▚▖▐▌▐▌  █ ▐▌   ▐▌  █     ▐▌ ▐▌▐▌ ▐▌▐▌   ▐▌ ▐▌▐▌ ▐▌▐▌  █ ▐▌   ▐▌   
-# ▐▌ ▐▌▐▌ ▝▜▌▐▛▀▜▌ █    █  ▐▛▀▀▘▐▌ ▝▜▌▐▌  █ ▐▛▀▀▘▐▌  █     ▐▌ ▐▌▐▛▀▘ ▐▌▝▜▌▐▛▀▚▖▐▛▀▜▌▐▌  █ ▐▛▀▀▘ ▝▀▚▖
-# ▝▚▄▞▘▐▌  ▐▌▐▌ ▐▌ █    █  ▐▙▄▄▖▐▌  ▐▌▐▙▄▄▀ ▐▙▄▄▖▐▙▄▄▀     ▝▚▄▞▘▐▌   ▝▚▄▞▘▐▌ ▐▌▐▌ ▐▌▐▙▄▄▀ ▐▙▄▄▖▗▄▄▞▘
+# Включаем unattended-upgrades
 
 echo "--- Включение Unattended Upgrades: ---"
 apt update && apt install -y unattended-upgrades
@@ -26,10 +19,7 @@ APT::Periodic::Unattended-Upgrade "1";' > /etc/apt/apt.conf.d/20auto-upgrades
 sed -i 's|//\s*"${distro_id}:${distro_codename}-security";|"${distro_id}:${distro_codename}-security";|' /etc/apt/apt.conf.d/50unattended-upgrades
 echo "--- Автообновления включены ---"
 
-# ▗▄▄▖ ▗▄▄▖ ▗▄▄▖      ▗▄▄▄▖▗▄▄▖       ▄▄▄▄ 
-# ▐▌ ▐▌▐▌ ▐▌▐▌ ▐▌       █  ▐▌ ▐▌      █    
-# ▐▛▀▚▖▐▛▀▚▖▐▛▀▚▖       █  ▐▛▀▘ █   █ █▀▀█ 
-# ▐▙▄▞▘▐▙▄▞▘▐▌ ▐▌     ▗▄█▄▖▐▌    ▀▄▀  █▄▄█ 
+# Включаем BBR, отключаем IPv6
                                                                           
 echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
 echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
@@ -42,21 +32,13 @@ sysctl -p
 echo "Если вы видите ошибку, откройте /etc/sysctl.conf и измените eth0 на ваш интерфейс из ifconfig"
 read -r
 
-#  ▗▄▖ ▗▖ ▗▖▗▄▄▄▖▗▄▖     ▗▄▄▖ ▗▄▄▄▖▗▄▄▖  ▗▄▖  ▗▄▖▗▄▄▄▖
-# ▐▌ ▐▌▐▌ ▐▌  █ ▐▌ ▐▌    ▐▌ ▐▌▐▌   ▐▌ ▐▌▐▌ ▐▌▐▌ ▐▌ █  
-# ▐▛▀▜▌▐▌ ▐▌  █ ▐▌ ▐▌    ▐▛▀▚▖▐▛▀▀▘▐▛▀▚▖▐▌ ▐▌▐▌ ▐▌ █  
-# ▐▌ ▐▌▝▚▄▞▘  █ ▝▚▄▞▘    ▐▌ ▐▌▐▙▄▄▖▐▙▄▞▘▝▚▄▞▘▝▚▄▞▘ █  
-                                           
-# 4:20 утра каждый понедельник
+# Включаем автоматическую перезагрузку в 4:20 утра каждый понедельник
+
 (crontab -l 2>/dev/null; echo "20 4 * * 1 /sbin/reboot") | crontab -
 echo "Добавлена перезагрузка в 4:20 каждый понедельник"
 
-# ▗▄▄▄▖ ▗▄▖ ▗▄▄▄▖▗▖   ▄▄▄▄ ▗▄▄▖  ▗▄▖ ▗▖  ▗▖
-# ▐▌   ▐▌ ▐▌  █  ▐▌      █ ▐▌ ▐▌▐▌ ▐▌▐▛▚▖▐▌
-# ▐▛▀▀▘▐▛▀▜▌  █  ▐▌   █▀▀▀ ▐▛▀▚▖▐▛▀▜▌▐▌ ▝▜▌
-# ▐▌   ▐▌ ▐▌▗▄█▄▖▐▙▄▄▖█▄▄▄ ▐▙▄▞▘▐▌ ▐▌▐▌  ▐▌
+# Устанавливаем и настраиваем Fail2Ban
 
-#!/bin/bash
 apt update && apt install -y fail2ban
 cat > /etc/fail2ban/jail.local << EOF
 [DEFAULT]
@@ -70,39 +52,40 @@ EOF
 systemctl enable fail2ban && systemctl start fail2ban
 echo "fail2ban настроен: ban 12h, 5 попыток за 15min"
 
-#  ▗▄▖ ▗▄▄▄  ▗▄▄▄       ▗▄▄▖▗▖ ▗▖▗▄▄▄   ▗▄▖     ▗▖ ▗▖ ▗▄▄▖▗▄▄▄▖▗▄▄▖ 
-# ▐▌ ▐▌▐▌  █ ▐▌  █     ▐▌   ▐▌ ▐▌▐▌  █ ▐▌ ▐▌    ▐▌ ▐▌▐▌   ▐▌   ▐▌ ▐▌
-# ▐▛▀▜▌▐▌  █ ▐▌  █      ▝▀▚▖▐▌ ▐▌▐▌  █ ▐▌ ▐▌    ▐▌ ▐▌ ▝▀▚▖▐▛▀▀▘▐▛▀▚▖
-# ▐▌ ▐▌▐▙▄▄▀ ▐▙▄▄▀     ▗▄▄▞▘▝▚▄▞▘▐▙▄▄▀ ▝▚▄▞▘    ▝▚▄▞▘▗▄▄▞▘▐▙▄▄▖▐▌ ▐▌
+# Добавляем пользователя sudo
                                                                    
-#!/bin/bash
 read -p "Введите имя пользователя: " username
 adduser --gecos "" $username
 usermod -aG sudo $username
 echo "Пользователь $username создан и добавлен в sudo"
 
-#  ▗▄▄▖▗▖ ▗▖▗▄▄▄   ▗▄▖     ▗▖    ▗▄▖  ▗▄▄▖
-# ▐▌   ▐▌ ▐▌▐▌  █ ▐▌ ▐▌    ▐▌   ▐▌ ▐▌▐▌   
-#  ▝▀▚▖▐▌ ▐▌▐▌  █ ▐▌ ▐▌    ▐▌   ▐▌ ▐▌▐▌▝▜▌
-# ▗▄▄▞▘▝▚▄▞▘▐▙▄▄▀ ▝▚▄▞▘    ▐▙▄▄▖▝▚▄▞▘▝▚▄▞▘
+# Включаем логгирование sudo
                                         
 echo "В следующем файле добавьте строку 'Defaults logfile=/var/log/sudo.log, log_input, log_output'"
 read -r -p "Окей, я скопировал её и готов"
 sudo visudo
 
-# ▗▖  ▗▖ ▗▄▖     ▗▄▄▖  ▗▄▖  ▗▄▖▗▄▄▄▖
-# ▐▛▚▖▐▌▐▌ ▐▌    ▐▌ ▐▌▐▌ ▐▌▐▌ ▐▌ █  
-# ▐▌ ▝▜▌▐▌ ▐▌    ▐▛▀▚▖▐▌ ▐▌▐▌ ▐▌ █  
-# ▐▌  ▐▌▝▚▄▞▘    ▐▌ ▐▌▝▚▄▞▘▝▚▄▞▘ █  
+# Для AmneziaVPN self-hosted
 
-#!/bin/bash
+read -p "Вы разворачиваете AmneziaVPN self-hosted? Y/n: " -r
+echo
+
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    echo "$username ALL=(ALL) NOPASSWD: ALL" | sudo EDITOR='tee' visudo -f /etc/sudoers.d/$username-nopasswd
+    echo "sudo-операции для созданного пользователя НЕ БУДУТ ТРЕБОВАТЬ ПАРОЛЬ"
+else
+    echo "sudo-операции для созданного пользователя будут происходить как обычно"
+fi
+
+# Отключаем вход через root
+
 sed -i 's/^PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
 systemctl restart ssh
 echo "Вход под root отключен"
 
 echo "========================================================================="
 echo "ВНИМАТЕЛЬНО ПРОЧТИТЕ: сейчас вам нужно открыть терминал на своём компьютере"
-echo "И создать ssh-ключ для входа на сервер следующей командой:"
+echo "И создать ssh-ключ для входа на сервер следующей командой (команда для Linux):"
 echo "ssh-keygen -t ed25519 -C "имяключа" -f ~/.ssh/имяключа"
 echo "Далее вам нужно загрузить этот ключ на сервер командой (замените значения):"
 echo "ssh-copy-id -i ~/.ssh/имяключа.pub логин@IP.сервера"
@@ -114,12 +97,8 @@ read -r
 grep -r PasswordAuthentication /etc/ssh -l | xargs -n 1 sed -i -e "/PasswordAuthentication /c\PasswordAuthentication no"
 echo "Вход по паролю отключён"
 
-#  ▗▄▄▖ ▗▄▄▖▗▖ ▗▖
-# ▐▌   ▐▌   ▐▌ ▐▌
-#  ▝▀▚▖ ▝▀▚▖▐▛▀▜▌
-# ▗▄▄▞▘▗▄▄▞▘▐▌ ▐▌
+# Смена SSH-порта
 
-#!/bin/bash
 read -p "Введите новый SSH порт: " port
 sed -i "s/^#Port.*/Port $port/" /etc/ssh/sshd_config
 sed -i "s/^Port.*/Port $port/" /etc/ssh/sshd_config
@@ -127,10 +106,7 @@ grep -q "^Port" /etc/ssh/sshd_config || echo "Port $port" >> /etc/ssh/sshd_confi
 systemctl restart ssh
 echo "SSH порт изменен на $port"
 
-# ▗▄▄▖ ▗▖ ▗▖▗▖  ▗▖    ▗▄▄▖ ▗▖    ▗▄▖  ▗▄▄▖▗▖ ▗▖
-# ▐▌ ▐▌▐▌▗▞▘▐▛▚▖▐▌    ▐▌ ▐▌▐▌   ▐▌ ▐▌▐▌   ▐▌▗▞▘
-# ▐▛▀▚▖▐▛▚▖ ▐▌ ▝▜▌    ▐▛▀▚▖▐▌   ▐▌ ▐▌▐▌   ▐▛▚▖ 
-# ▐▌ ▐▌▐▌ ▐▌▐▌  ▐▌    ▐▙▄▞▘▐▙▄▄▖▝▚▄▞▘▝▚▄▄▖▐▌ ▐▌
+# Настройка iptables и блокировка IP-адресов РКН
 
 echo "Настройка iptables"
 iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
@@ -149,10 +125,7 @@ cd iptables-rugov-block
 
 echo "Настройка iptables завершена"
 
-#  ▗▄▄▖▗▖ ▗▖ ▗▄▖ ▗▄▄▖  
-# ▐▌   ▐▌ ▐▌▐▌ ▐▌▐▌ ▐▌ 
-#  ▝▀▚▖▐▌ ▐▌▐▛▀▜▌▐▛▀▘  
-# ▗▄▄▞▘▐▙█▟▌▐▌ ▐▌▐▌    
+# Добавляем 2 Гб подкачки для самых дешёвых VPS с 1 Гб RAM
 
 swapfile="/swapfile"
 if [ -f "$swapfile" ]; then
@@ -166,21 +139,14 @@ swapon $swapfile
 echo "$swapfile none swap sw 0 0" >> /etc/fstab
 echo "Создан swap файл 2GB и активирован"
                            
-#  ▗▄▄▖▗▄▄▄▖ ▗▄▖     ▗▄▄▄▖▗▄▄▖ 
-# ▐▌   ▐▌   ▐▌ ▐▌      █  ▐▌ ▐▌
-# ▐▌▝▜▌▐▛▀▀▘▐▌ ▐▌      █  ▐▛▀▘ 
-# ▝▚▄▞▘▐▙▄▄▖▝▚▄▞▘    ▗▄█▄▖▐▌   
+# Смотрим GeoIP
                 
 wget -O ipregion.sh https://ipregion.vrnt.xyz
 chmod +x ipregion.sh
 ./ipregion.sh
 
-# ▗▖  ▗▖▗▄▄▖  ▗▄▄▖     ▗▄▖ ▗▖ ▗▖▗▄▄▄  ▗▄▄▄▖▗▄▄▄▖
-# ▐▌  ▐▌▐▌ ▐▌▐▌       ▐▌ ▐▌▐▌ ▐▌▐▌  █   █    █  
-# ▐▌  ▐▌▐▛▀▘  ▝▀▚▖    ▐▛▀▜▌▐▌ ▐▌▐▌  █   █    █  
-#  ▝▚▞▘ ▐▌   ▗▄▄▞▘    ▐▌ ▐▌▝▚▄▞▘▐▙▄▄▀ ▗▄█▄▖  █  
+# Аудит безопасности
                                        
 curl -O https://raw.githubusercontent.com/vernu/vps-audit/main/vps-audit.sh
 chmod +x vps-audit.sh
 sudo ./vps-audit.sh
-
