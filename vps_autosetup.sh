@@ -7,12 +7,21 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
+# Прерывание при ошибке
+
+set -e
+
+# Обновление системы
+
 echo "Обновление"                                                                                          
 apt update
 apt upgrade
 
-echo "Установка базовых программ"
-apt install sudo mc git iptables-persistent chkrootkit rkhunter rsyslog micro htop tcpdump net-tools dnsutils jq
+# Базовый набор программ
+
+echo "Установка базовых программ: sudo, mc, git, iptables-persistent, chkrootkit,"
+echo "rkhunter, rsyslog, micro, htop, tcpdump, net-tools, dnsutils, jq, docker"
+apt install sudo mc git iptables-persistent chkrootkit rkhunter rsyslog micro htop tcpdump net-tools dnsutils jq docker
 
 # Включаем unattended-upgrades
 
@@ -115,14 +124,37 @@ echo "SSH порт изменен на $port"
 # Настройка iptables и блокировка IP-адресов РКН
 
 echo "Настройка iptables"
+
+# Разрешает весь трафик, который является частью уже установленных соединений
+# Чтобы ответы на ваши исходящие запросы могли приходить обратно
 iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
-iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport $port -j ACCEPT 
-iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
-iptables -A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
+
+# Разрешает весь трафик на локальном интерфейсе
+# Чтобы программы на этом же сервере могли общаться друг с другом через localhost
 iptables -A INPUT -i lo -j ACCEPT
+
+#Разрешает исходящий трафик на локальный интерфейс
 iptables -A OUTPUT -o lo -j ACCEPT
+
+# Разрешаем исходящий трафик
+iptables -A OUTPUT -j ACCEPT
+
+# Разрешаем новые TCP подключения на новый ssh-порт
+iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport $port -j ACCEPT
+
+# Разрешает входящие подключения на HTTP
+iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+
+# Разрешает входящие подключения на HTTPS
+iptables -A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
+
+# Весь трафик, не подпадающий под разрешающие правила выше, будет блокироваться
 iptables -P INPUT DROP
+
+# Удаляет правило, разрешающее старый SSH-порт 22
 iptables -D INPUT -p tcp --dport 22 -j ACCEPT
+
+# Сохраняет правила
 iptables-save > /etc/network/iptables.rules
 
 git clone https://github.com/freemedia-tech/iptables-rugov-block.git
