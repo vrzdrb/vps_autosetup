@@ -41,7 +41,7 @@ echo "Настройки DNS применены"
 # Базовый набор программ
 
 echo "Установка базового ПО"
-apt install sudo mc git ufw chkrootkit rkhunter rsyslog micro htop tcpdump net-tools dnsutils jq docker
+apt install sudo mc git ufw chkrootkit rkhunter rsyslog micro htop tcpdump net-tools dnsutils jq
 echo "Установка завершена"
 
 
@@ -104,23 +104,20 @@ systemctl enable fail2ban && systemctl start fail2ban
 echo "fail2ban настроен: бан на 12 часов спустя 5 попыток за 15 минут"
 
 
-# Добавляем пользователя sudo
-                                                                   
+# Добавляем пользователя sudo                                                  
 read -p "Введите имя нового пользователя sudo:" username
 adduser --gecos "" $username
 usermod -aG sudo $username
 echo "Пользователь $username создан и добавлен в sudo"
 
 
-# Включаем логгирование sudo
-                                        
+# Включаем логгирование sudo                            
 echo "В следующем файле добавьте строку 'Defaults logfile=/var/log/sudo.log, log_input, log_output'"
 read -r -p "Окей, я скопировал её и готов"
 sudo visudo
 
 
 # Для AmneziaVPN self-hosted
-
 read -p "Вы разворачиваете AmneziaVPN self-hosted? Y/n:" -r
 echo
 
@@ -132,7 +129,6 @@ fi
 
 
 # Настройка безопасности SSH:
-
 echo "======================================================================================="
 echo "ВНИМАТЕЛЬНО ПРОЧТИТЕ: сейчас вам нужно открыть терминал на своём компьютере"
 echo "И создать ssh-ключ для входа на сервер следующей командой:"
@@ -152,6 +148,44 @@ echo "==========================================================================
 read -r
 
 echo "Применяем настройки безопасности SSH"
+
+BACKUP_FILE="/etc/ssh/sshd_config.backup_$(date +%Y%m%d_%H%M%S)"
+cp "$SSHD_CONFIG" "$BACKUP_FILE"
+echo "Создана резервная копия: $BACKUP_FILE"
+
+if grep -q "^PubkeyAuthentication" "$SSHD_CONFIG"; then
+    sed -i 's/^PubkeyAuthentication.*/PubkeyAuthentication yes/' "$SSHD_CONFIG"
+else
+    echo "PubkeyAuthentication yes" >> "$SSHD_CONFIG"
+fi
+
+if grep -q "^PasswordAuthentication" "$SSHD_CONFIG"; then
+    sed -i 's/^PasswordAuthentication.*/PasswordAuthentication no/' "$SSHD_CONFIG"
+else
+    echo "PasswordAuthentication no" >> "$SSHD_CONFIG"
+fi
+
+if grep -q "^GSSAPIAuthentication" "$SSHD_CONFIG"; then
+    sed -i 's/^GSSAPIAuthentication.*/GSSAPIAuthentication no/' "$SSHD_CONFIG"
+else
+    echo "GSSAPIAuthentication no" >> "$SSHD_CONFIG"
+fi
+
+if grep -q "^PermitRootLogin" "$SSHD_CONFIG"; then
+    sed -i 's/^PermitRootLogin.*/PermitRootLogin prohibit-password/' "$SSHD_CONFIG"
+else
+    echo "PermitRootLogin prohibit-password" >> "$SSHD_CONFIG"
+fi
+
+echo "Проверка конфигурации SSH..."
+if sshd -t -f "$SSHD_CONFIG"; then
+    echo "Конфигурация SSH корректна"
+else
+    echo "Ошибка в конфигурации SSH! Восстанавливаем из резервной копии..."
+    cp "$BACKUP_FILE" "$SSHD_CONFIG"
+    echo "Конфигурация восстановлена из резервной копии"
+    exit 1
+fi
 
 mkdir -p /etc/ssh/sshd_config.d
 
@@ -173,8 +207,6 @@ ChallengeResponseAuthentication no
 KerberosAuthentication no
 EOF
 
-systemctl restart sshd
-
 echo "Настройки безопасности SSH применены"
 echo "Смена SSH-порта"
 
@@ -183,13 +215,18 @@ sed -i "s/^#Port.*/Port $port/" /etc/ssh/sshd_config.d/99-security-settings.conf
 sed -i "s/^Port.*/Port $port/" /etc/ssh/sshd_config.d/99-security-settings.conf
 grep -q "^Port" /etc/ssh/sshd_config.d/99-security-settings.conf || echo "Port $port" >> /etc/ssh/sshd_config.d/99-security-settings.conf
 
-systemctl restart ssh
+echo "Перезапуск службы SSH..."
+if systemctl restart sshd; then
+    echo "Служба SSH перезапущена через sshd"
+else
+    systemctl restart ssh
+    echo "Служба SSH перезапущена через ssh"
+fi
 
 echo "SSH порт изменен на $port"
 
 
 # Настройка ufw и блокировка IP-адресов РКН
-
 echo "Базовая настройка ufw"
 
 IP4_REGEX="^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$"
@@ -238,8 +275,27 @@ fi
 echo "Настройка ufw под РКН завершена!"
 
 
-# Добавляем 2 Гб подкачки для самых дешёвых VPS с 1 Гб RAM
+# Смотрим GeoIP 
+wget -O ipregion.sh https://ipregion.vrnt.xyz
+chmod +x ipregion.sh
+./ipregion.sh
 
+#Cмотрим IPQuality
+bash <(curl -sL https://Check.Place) -EI
+read -r
+
+ 
+# Смотрим bench.sh
+curl -Lso- bench.sh | bash
+read -r
+
+# Минимальный аудит безопасности
+curl -O https://raw.githubusercontent.com/vernu/vps-audit/main/vps-audit.sh
+chmod +x vps-audit.sh
+sudo ./vps-audit.sh
+read -r
+
+# Добавляем 2 Гб подкачки для самых дешёвых VPS с 1 Гб RAM
 echo "Добавляем 2Гб подкачки"
 
 swapfile="/swapfile"
@@ -254,17 +310,3 @@ swapon $swapfile
 echo "$swapfile none swap sw 0 0" >> /etc/fstab
 
 echo "2Гб подкачки созданы и активированы"
-               
-                           
-# Смотрим GeoIP
-                
-wget -O ipregion.sh https://ipregion.vrnt.xyz
-chmod +x ipregion.sh
-./ipregion.sh
-
-
-# Минимальный аудит безопасности
-                                       
-curl -O https://raw.githubusercontent.com/vernu/vps-audit/main/vps-audit.sh
-chmod +x vps-audit.sh
-sudo ./vps-audit.sh
