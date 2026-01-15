@@ -22,8 +22,11 @@ apt upgrade
 
 
 # Шифрование DNS
-
+echo ""
+echo ""
 echo "Настройки DNS..."
+echo ""
+echo ""
 
 tee /etc/systemd/resolved.conf <<EOF
 [Resolve]
@@ -35,31 +38,48 @@ DNSOverTLS=yes
 EOF
 systemctl restart systemd-resolved.service
 
+echo ""
+echo ""
 echo "Настройки DNS применены"
-
+echo ""
+echo ""
 
 # Базовый набор программ
-
+echo ""
+echo ""
 echo "Установка базового ПО"
-apt install sudo mc git ufw chkrootkit rkhunter rsyslog micro htop tcpdump net-tools dnsutils jq
+echo ""
+echo ""
+apt install sudo mc ufw chkrootkit rkhunter micro htop tcpdump net-tools dnsutils jq ranger
+echo ""
+echo ""
 echo "Установка завершена"
+echo ""
+echo ""
 
 
 # Включаем unattended-upgrades
-
+echo ""
+echo ""
 echo "Включаем unattended-upgrades"
-
+echo ""
+echo ""
 echo 'Unattended-Upgrade::Mail "root";' >> /etc/apt/apt.conf.d/50unattended-upgrades
 echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true | debconf-set-selections
 dpkg-reconfigure -f noninteractive unattended-upgrades
 systemctl restart unattended-upgrades
-
+echo ""
+echo ""
 echo "unattended-upgrades включены"
-
+echo ""
+echo ""
 
 # Включаем BBR, отключаем IPv6
-
+echo ""
+echo ""
 echo "Включаем BBR, отключаем IPv6"
+echo ""
+echo ""
 
 if ! grep -q "net.core.default_qdisc = fq" /etc/sysctl.conf; then
     echo "net.core.default_qdisc = fq" >> /etc/sysctl.conf
@@ -67,58 +87,69 @@ fi
 if ! grep -q "net.ipv4.tcp_congestion_control = bbr" /etc/sysctl.conf; then
     echo "net.ipv4.tcp_congestion_control = bbr" >> /etc/sysctl.conf
 fi
-
-sh -c 'echo "
-net.ipv6.conf.all.disable_ipv6 = 1
-net.ipv6.conf.default.disable_ipv6 = 1
-net.ipv6.conf.lo.disable_ipv6 = 1
-" >> /etc/sysctl.conf'
+if ! grep -q "net.ipv6.conf.all.disable_ipv6 = 1" /etc/sysctl.conf; then
+    echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf
+fi
+if ! grep -q "net.ipv6.conf.default.disable_ipv6 = 1" /etc/sysctl.conf; then
+    echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.conf
+fi
+if ! grep -q "net.ipv6.conf.lo.disable_ipv6 = 1" /etc/sysctl.conf; then
+    echo "net.ipv6.conf.lo.disable_ipv6 = 1" >> /etc/sysctl.conf
+fi
 
 sysctl -p
 
+echo ""
+echo ""
 echo "BBR включен, IPv6 отключен"
+echo ""
+echo ""
 
 # Включаем автоматическую перезагрузку в 4:20 утра каждый понедельник
+echo ""
+echo ""
+echo "Включаем автоматическую перезагрузку"
+echo ""
+echo ""
 
 (crontab -l 2>/dev/null; echo "20 4 * * 1 /sbin/reboot") | crontab -
 
+echo ""
+echo ""
 echo "Добавлена перезагрузка в 4:20 каждый понедельник"
-
-
-# Устанавливаем и настраиваем Fail2Ban
-
-echo "Настройка fail2ban"
-
-apt update && apt install -y fail2ban
-cat > /etc/fail2ban/jail.local << EOF
-[DEFAULT]
-bantime = 43200
-findtime = 900
-maxretry = 5
-
-[sshd]
-enabled = true
-EOF
-systemctl enable fail2ban && systemctl start fail2ban
-
-echo "fail2ban настроен: бан на 12 часов спустя 5 попыток за 15 минут"
-
+echo ""
+echo ""
 
 # Добавляем пользователя sudo                                                  
+echo ""
+echo ""
 read -p "Введите имя нового пользователя sudo:" username
+echo ""
+echo ""
 adduser --gecos "" $username
 usermod -aG sudo $username
+echo ""
+echo ""
 echo "Пользователь $username создан и добавлен в sudo"
-
+echo ""
+echo ""
 
 # Включаем логгирование sudo                            
+echo ""
+echo ""
 echo "В следующем файле добавьте строку 'Defaults logfile=/var/log/sudo.log, log_input, log_output'"
+echo ""
+echo ""
 read -r -p "Окей, я скопировал её и готов"
 sudo visudo
 
 
 # Для AmneziaVPN self-hosted
+echo ""
+echo ""
 read -p "Вы разворачиваете AmneziaVPN self-hosted? Y/n:" -r
+echo ""
+echo ""
 echo
 
 if [[ $REPLY =~ ^[Yy]$ ]]; then
@@ -129,6 +160,8 @@ fi
 
 
 # Настройка безопасности SSH:
+echo ""
+echo ""
 echo "======================================================================================="
 echo "ВНИМАТЕЛЬНО ПРОЧТИТЕ: сейчас вам нужно открыть терминал на своём компьютере"
 echo "И создать ssh-ключ для входа на сервер следующей командой:"
@@ -146,12 +179,24 @@ echo ""
 echo "ТОЛЬКО ЕСЛИ ВХОД УСПЕШЕН, нажмите здесь Enter для ОТКЛЮЧЕНИЯ ВХОДА В SSH ПО ПАРОЛЮ "
 echo "======================================================================================="
 read -r
-
+echo ""
+echo ""
 echo "Применяем настройки безопасности SSH"
+echo ""
+echo ""
+
+SSHD_CONFIG="/etc/ssh/sshd_config"
+SSH_CONFIG="/etc/ssh/ssh_config"
+if [ ! -f "$SSHD_CONFIG" ]; then
+    echo "Ошибка: Файл $SSHD_CONFIG не найден"
+    exit 1
+fi
 
 BACKUP_FILE="/etc/ssh/sshd_config.backup_$(date +%Y%m%d_%H%M%S)"
 cp "$SSHD_CONFIG" "$BACKUP_FILE"
 echo "Создана резервная копия: $BACKUP_FILE"
+
+rm /etc/ssh/sshd_config.d/50-cloud-init.conf
 
 if grep -q "^PubkeyAuthentication" "$SSHD_CONFIG"; then
     sed -i 's/^PubkeyAuthentication.*/PubkeyAuthentication yes/' "$SSHD_CONFIG"
@@ -172,9 +217,15 @@ else
 fi
 
 if grep -q "^PermitRootLogin" "$SSHD_CONFIG"; then
-    sed -i 's/^PermitRootLogin.*/PermitRootLogin prohibit-password/' "$SSHD_CONFIG"
+    sed -i 's/^PermitRootLogin.*/PermitRootLogin no/' "$SSHD_CONFIG"
 else
-    echo "PermitRootLogin prohibit-password" >> "$SSHD_CONFIG"
+    echo "PermitRootLogin no" >> "$SSHD_CONFIG"
+fi
+
+if grep -q "^GSSAPIAuthentication" "$SSH_CONFIG"; then
+    sed -i 's/^GSSAPIAuthentication.*/GSSAPIAuthentication no/' "$SSH_CONFIG"
+else
+    echo "GSSAPIAuthentication no" >> "$SSH_CONFIG"
 fi
 
 echo "Проверка конфигурации SSH..."
@@ -191,7 +242,7 @@ mkdir -p /etc/ssh/sshd_config.d
 
 cat > /etc/ssh/sshd_config.d/99-security-settings.conf << 'EOF'
 Port 22
-PermitRootLogin prohibit-password
+PermitRootLogin no
 PubkeyAuthentication yes
 PasswordAuthentication no
 PermitEmptyPasswords no
@@ -207,15 +258,27 @@ ChallengeResponseAuthentication no
 KerberosAuthentication no
 EOF
 
+echo ""
+echo ""
 echo "Настройки безопасности SSH применены"
+echo ""
+echo ""
 echo "Смена SSH-порта"
-
+echo ""
+echo ""
 read -p "Введите новый SSH порт:" port
+echo ""
+echo ""
+
 sed -i "s/^#Port.*/Port $port/" /etc/ssh/sshd_config.d/99-security-settings.conf
 sed -i "s/^Port.*/Port $port/" /etc/ssh/sshd_config.d/99-security-settings.conf
 grep -q "^Port" /etc/ssh/sshd_config.d/99-security-settings.conf || echo "Port $port" >> /etc/ssh/sshd_config.d/99-security-settings.conf
 
+echo ""
+echo ""
 echo "Перезапуск службы SSH..."
+echo ""
+echo ""
 if systemctl restart sshd; then
     echo "Служба SSH перезапущена через sshd"
 else
@@ -223,11 +286,18 @@ else
     echo "Служба SSH перезапущена через ssh"
 fi
 
+echo ""
+echo ""
 echo "SSH порт изменен на $port"
-
+echo ""
+echo ""
 
 # Настройка ufw и блокировка IP-адресов РКН
+echo ""
+echo ""
 echo "Базовая настройка ufw"
+echo ""
+echo ""
 
 IP4_REGEX="^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$"
 IP4=$(ip route get 8.8.8.8 2>/dev/null | grep -Po -- 'src \K\S*')
@@ -248,9 +318,14 @@ ufw allow 443/tcp comment 'WEB'
 ufw insert 1 deny from "$BLOCK_ZONE_IP"
 ufw --force enable
 
+echo ""
+echo ""
 echo "Базовая настройка ufw прошла успешно"
+echo ""
+echo ""
 echo "Блокировка IP-адресов РКН"
-
+echo ""
+echo ""
 cat > add_blacklist.sh << 'EOF'
 wget -O blacklist.txt https://raw.githubusercontent.com/C24Be/AS_Network_List/main/blacklists/blacklist.txt
 if [[ ! -f blacklist.txt ]]; then
@@ -279,6 +354,7 @@ echo "Настройка ufw под РКН завершена!"
 wget -O ipregion.sh https://ipregion.vrnt.xyz
 chmod +x ipregion.sh
 ./ipregion.sh
+read -r
 
 #Cмотрим IPQuality
 bash <(curl -sL https://Check.Place) -EI
@@ -295,18 +371,26 @@ chmod +x vps-audit.sh
 sudo ./vps-audit.sh
 read -r
 
-# Добавляем 2 Гб подкачки для самых дешёвых VPS с 1 Гб RAM
-echo "Добавляем 2Гб подкачки"
+# Добавляем 1 Гб подкачки для самых дешёвых VPS с 1 Гб RAM
+echo ""
+echo ""
+echo "Добавляем 1Гб подкачки"
+echo ""
+echo ""
 
 swapfile="/swapfile"
 if [ -f "$swapfile" ]; then
     echo "Swap файл уже существует"
     exit 1
 fi
-dd if=/dev/zero of=$swapfile bs=1M count=2048
+dd if=/dev/zero of=$swapfile bs=1M count=1024
 chmod 600 $swapfile
 mkswap $swapfile
 swapon $swapfile
 echo "$swapfile none swap sw 0 0" >> /etc/fstab
 
-echo "2Гб подкачки созданы и активированы"
+echo ""
+echo ""
+echo "1Гб подкачки создан и активирован"
+echo ""
+echo ""
