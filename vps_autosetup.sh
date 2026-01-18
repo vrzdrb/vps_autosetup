@@ -50,7 +50,7 @@ echo ""
 echo "Установка базового ПО"
 echo ""
 echo ""
-apt install sudo mc ufw chkrootkit rkhunter micro htop tcpdump net-tools dnsutils jq ranger
+apt install sudo mc ufw chkrootkit micro htop tcpdump net-tools dnsutils jq ranger iftop nethogs bmon
 echo ""
 echo ""
 echo "Установка завершена"
@@ -196,8 +196,6 @@ BACKUP_FILE="/etc/ssh/sshd_config.backup_$(date +%Y%m%d_%H%M%S)"
 cp "$SSHD_CONFIG" "$BACKUP_FILE"
 echo "Создана резервная копия: $BACKUP_FILE"
 
-rm /etc/ssh/sshd_config.d/50-cloud-init.conf
-
 if grep -q "^PubkeyAuthentication" "$SSHD_CONFIG"; then
     sed -i 's/^PubkeyAuthentication.*/PubkeyAuthentication yes/' "$SSHD_CONFIG"
 else
@@ -269,6 +267,8 @@ echo ""
 read -p "Введите новый SSH порт:" port
 echo ""
 echo ""
+
+chmod 600 ~/.ssh/authorized_keys
 
 sed -i "s/^#Port.*/Port $port/" /etc/ssh/sshd_config.d/99-security-settings.conf
 sed -i "s/^Port.*/Port $port/" /etc/ssh/sshd_config.d/99-security-settings.conf
