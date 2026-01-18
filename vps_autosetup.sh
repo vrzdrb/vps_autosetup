@@ -19,7 +19,7 @@ set -e
 echo "Обновление"                                                                                          
 apt update
 apt upgrade
-
+apt install systemd-resolved
 
 # Шифрование DNS
 echo ""
@@ -50,7 +50,7 @@ echo ""
 echo "Установка базового ПО"
 echo ""
 echo ""
-apt install sudo mc ufw chkrootkit micro htop tcpdump net-tools dnsutils jq ranger iftop nethogs bmon
+apt install unattended-upgrades sudo mc ufw chkrootkit micro htop tcpdump net-tools dnsutils jq ranger iftop nethogs bmon
 echo ""
 echo ""
 echo "Установка завершена"
@@ -165,16 +165,16 @@ echo ""
 echo "======================================================================================="
 echo "ВНИМАТЕЛЬНО ПРОЧТИТЕ: сейчас вам нужно открыть терминал на своём компьютере"
 echo "И создать ssh-ключ для входа на сервер следующей командой:"
-echo "ssh-keygen -t ed25519 -C "имяключа" -f ~/.ssh/имяключа"
+echo "ssh-keygen -t ed25519 -C "имяключа" -f имяключа"
 echo ""
 echo "Загрузите ключ на сервер (команда для Linux):"
-echo "ssh-copy-id -i ~/.ssh/имяключа.pub $username@IP.сервера"
+echo "ssh-copy-id -i имяключа.pub $username@IP.сервера"
 echo ""
 echo "Команда для Windows:"
-echo "cat ~/.ssh/id_ed25519.pub | ssh $username@IP.сервера mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+echo "cat id_ed25519.pub | ssh $username@IP.сервера mkdir -p && cat >> ~/.ssh/authorized_keys"
 echo ""
 echo "Попробуйте подключиться к вашему серверу при помощи этого ключа: "
-echo "ssh -i ~/.ssh/имяключа $username@IP.сервера "
+echo "ssh -i имяключа $username@IP.сервера "
 echo ""
 echo "ТОЛЬКО ЕСЛИ ВХОД УСПЕШЕН, нажмите здесь Enter для ОТКЛЮЧЕНИЯ ВХОДА В SSH ПО ПАРОЛЮ "
 echo "======================================================================================="
