@@ -244,7 +244,7 @@ mkdir -p /etc/ssh/sshd_config.d
 
 cat > /etc/ssh/sshd_config.d/99-security-settings.conf << 'EOF'
 Port 22
-PermitRootLogin no
+PermitRootLogin prohibit-password
 PubkeyAuthentication yes
 PasswordAuthentication no
 PermitEmptyPasswords no
