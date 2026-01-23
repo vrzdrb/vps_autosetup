@@ -19,7 +19,6 @@ set -e
 echo "Обновление"                                                                                          
 apt update
 apt upgrade
-apt install systemd-resolved
 
 # Шифрование DNS
 echo ""
@@ -27,6 +26,8 @@ echo ""
 echo "Настройки DNS..."
 echo ""
 echo ""
+
+apt install systemd-resolved
 
 tee /etc/systemd/resolved.conf <<EOF
 [Resolve]
@@ -36,6 +37,9 @@ Domains=~.
 DNSSEC=yes
 DNSOverTLS=yes
 EOF
+
+systemctl enable systemd-resolved.service
+systemctl start systemd-resolved.service
 systemctl restart systemd-resolved.service
 
 echo ""
@@ -215,9 +219,9 @@ else
 fi
 
 if grep -q "^PermitRootLogin" "$SSHD_CONFIG"; then
-    sed -i 's/^PermitRootLogin.*/PermitRootLogin no/' "$SSHD_CONFIG"
+    sed -i 's/^PermitRootLogin.*/PermitRootLogin prohibit-password/' "$SSHD_CONFIG"
 else
-    echo "PermitRootLogin no" >> "$SSHD_CONFIG"
+    echo "PermitRootLogin prohibit-password" >> "$SSHD_CONFIG"
 fi
 
 if grep -q "^GSSAPIAuthentication" "$SSH_CONFIG"; then
