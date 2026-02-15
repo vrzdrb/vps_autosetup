@@ -15,7 +15,7 @@ echo -e "\e[96m$1\e[0m"
 # Яркий розовый
 echo -e "\e[38;5;213m$1\e[0m"
 
-echo -e " \e[96m███████╗██╗   ██╗███████╗    ██╗   ██╗██████╗ ██████╗  █████╗ ████████╗███████╗
+echo -e "\e[96m███████╗██╗   ██╗███████╗    ██╗   ██╗██████╗ ██████╗  █████╗ ████████╗███████╗
 ██╔════╝╚██╗ ██╔╝██╔════╝    ██║   ██║██╔══██╗██╔══██╗██╔══██╗╚══██╔══╝██╔════╝
 ███████╗ ╚████╔╝ ███████╗    ██║   ██║██████╔╝██║  ██║███████║   ██║   █████╗  
 ╚════██║  ╚██╔╝  ╚════██║    ██║   ██║██╔═══╝ ██║  ██║██╔══██║   ██║   ██╔══╝  
@@ -127,8 +127,7 @@ echo -e "\e[38;5;213mПопробуйте подключиться к вашем
 echo -e "\e[96mssh -i имяключа root@$IP\e[0m"
 
 echo -e "\e[38;5;213mТОЛЬКО ЕСЛИ ВХОД УСПЕШЕН, нажмите здесь Enter для ОТКЛЮЧЕНИЯ ВХОДА В SSH ПО ПАРОЛЮ\e[0m"
-echo -e "\e[38;5;213m=======================================================================================\e[0m
-
+echo -e "\e[38;5;213m=======================================================================================\e[0m"
 read -r
 
 SSHD_CONFIG="/etc/ssh/sshd_config"
@@ -257,18 +256,14 @@ read -r
 
 #Cмотрим IPQuality
 bash <(curl -sL https://Check.Place) -EI
+
+# Смотрим speedtest
+curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | bash
+apt-get install speedtest -y
+speedtest
+
 read -r
 
- 
-# Смотрим bench.sh
-curl -Lso- bench.sh | bash
-read -r
-
-# Минимальный аудит безопасности
-curl -O https://raw.githubusercontent.com/vernu/vps-audit/main/vps-audit.sh
-chmod +x vps-audit.sh
-sudo ./vps-audit.sh
-read -r
 
 echo -e "\e[38;5;213m███████╗██╗    ██╗ █████╗ ██████╗ 
 ██╔════╝██║    ██║██╔══██╗██╔══██╗
