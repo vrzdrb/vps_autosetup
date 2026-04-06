@@ -126,7 +126,7 @@ create_user() {
 # 3. Настройки SSH
 setup_ssh() {
     echo -e "${CYAN}Настройка SSH...${NC}"
-    echo -ne "${CYAN}Введите имя пользователя, под которым вы будете заходить в систему: ${NC}"
+    echo -ne "${CYAN}Введите имя созданного пользователя (НЕ ROOT): ${NC}"
     read -r username
     IP=$(curl -s --max-time 5 ifconfig.me)
     
@@ -223,7 +223,7 @@ EOF
     read -p "$(echo -e ${CYAN}Введите новый SSH порт: ${NC})" port
     echo ""
     
-    chmod 600 ~/.ssh/authorized_keys
+    chmod 600 /home/$username/.ssh/authorized_keys
     
     sed -i "s/^#Port.*/Port $port/" /etc/ssh/sshd_config.d/99-security-settings.conf
     sed -i "s/^Port.*/Port $port/" /etc/ssh/sshd_config.d/99-security-settings.conf
