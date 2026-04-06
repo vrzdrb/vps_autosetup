@@ -387,7 +387,7 @@ while true; do
             run_vps_audit
             ;;
         0)
-            echo -e "${GREEN}Хуй в ладошку - и в дорожку!}!${NC}"
+            echo -e "${GREEN}Хуй в ладошку - и в дорожку!${NC}"
             exit 0
             ;;
         *)
