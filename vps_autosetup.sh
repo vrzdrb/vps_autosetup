@@ -244,6 +244,10 @@ EOF
 # 4. Настройки UFW
 setup_ufw() {
     echo -e "${CYAN}Настройка UFW...${NC}"
+
+    echo ""
+    read -p "$(echo -e ${CYAN}Введите ваш SSH порт: ${NC})" port
+    echo ""
     
     IP4_REGEX="^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$"
     IP4=$(ip route get 8.8.8.8 2>/dev/null | grep -Po -- 'src \K\S*')
@@ -259,7 +263,7 @@ setup_ufw() {
     
     BLOCK_ZONE_IP=$(echo ${IP4} | cut -d '.' -f 1-3).0/22
     ufw --force reset
-    ufw limit 22/tcp comment 'SSH'
+    ufw limit $port/tcp comment 'SSH'
     ufw allow 443/tcp comment 'WEB'
     ufw insert 1 deny from "$BLOCK_ZONE_IP"
     ufw --force enable
