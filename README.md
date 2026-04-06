@@ -1,18 +1,18 @@
 # VPS autosetup
 
-Скрипт автоматически производит базовую настройку VPS-сервера:
-- Устанавливает минимальный набор программ вроде midnight commander, micro, ufw;
-- Включает: unattended-upgrades, BBR, авто-перезагрузку (раз в неделю), 1Гб подкачки для дешёвых VPS с 1Гб RAM; 
-- Помогает создать и загрузить ssh-ключ, меняет SSH порт;
-- Выключает: IPv6, вход по паролю;
-- Настраивает UFW;
-- Показывает вывод ipregion (by https://ipregion.vrnt.xyz);
-- Показывает вывод IPQuality (by https://Check.Place);
-- Показывает вывод bench.sh;
-- Показывает вывод vps-audit (by https://github.com/vernu/vps-audit).
+Скрипт позволяет быстро произвести базовую настройку VPS-сервера:
+- Установить минимальный набор программ вроде midnight commander, micro, ufw;
+- Включить: unattended-upgrades, BBR, авто-перезагрузку (раз в неделю), 1Гб подкачки для дешёвых VPS с 1Гб RAM; 
+- Создать и загрузить ssh-ключ, изменить SSH порт;
+- Отключить: IPv6, вход по паролю;
+- Настроить UFW (в том числе на блокировку ботов РКН);
+- Посмотреть ipregion (by https://ipregion.vrnt.xyz);
+- Посмотреть IPQuality (by https://Check.Place);
+- Посмотреть vps-audit (by https://github.com/vernu/vps-audit).
 
-## Требования:
-- Debian 12 / 13
+## Проверено на:
+- Debian 12+
+- Ubuntu 24.04+
 
 ## Загрузка (запускать под root):
 ```bash
@@ -20,4 +20,3 @@ curl -o vps_autosetup.sh https://raw.githubusercontent.com/vrzdrb/vps_autosetup/
 chmod +x vps_autosetup.sh
 ./vps_autosetup.sh
 ```
-Скрипт написан новичком для новичков, любые предложения по улучшению буду рад видеть в issues.
