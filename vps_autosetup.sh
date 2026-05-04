@@ -68,7 +68,7 @@ EOF
     systemctl restart systemd-resolved.service
 
     echo -e "${CYAN}Установка дополнительных пакетов...${NC}"
-    apt install unattended-upgrades sudo mc ufw chkrootkit micro htop tcpdump net-tools dnsutils jq iftop nethogs bmon -y
+    apt install unattended-upgrades sudo mc ufw micro htop -y
     echo 'Unattended-Upgrade::Mail "root";' >> /etc/apt/apt.conf.d/50unattended-upgrades
     echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true | debconf-set-selections
     dpkg-reconfigure -f noninteractive unattended-upgrades
