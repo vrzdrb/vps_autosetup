@@ -2,7 +2,7 @@
 <img width="649" height="347" alt="preview" src="https://github.com/user-attachments/assets/44679186-9798-4fe7-9b43-ce9be2ca452f" />
 
 Скрипт позволяет быстро произвести базовую настройку VPS-сервера:
-- Установить минимальный набор программ (sudo mc ufw chkrootkit micro htop tcpdump net-tools dnsutils jq iftop nethogs bmon);
+- Установить минимальный набор программ (sudo mc ufw micro htop jq);
 - Включить: unattended-upgrades, BBR, авто-перезагрузку (раз в неделю), 1Гб подкачки для дешёвых VPS с 1Гб RAM; 
 - Создать и загрузить ssh-ключ, изменить SSH порт;
 - Отключить: IPv6, вход по паролю;
