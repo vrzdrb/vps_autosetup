@@ -369,19 +369,31 @@ enable_sudo_logging() {
     echo 'Defaults logfile="/var/log/sudo.log"' | sudo tee -a "$sudoers_file" > /dev/null
     if sudo visudo -cf "$sudoers_file"; then
         echo "[OK] Sudo logging enabled. Logs will be in /var/log/sudo.log"
+        read -r
     else
         echo "[ERROR] Failed to configure sudo logging"
+        read -r
     fi
 }
 
 # 11. Password policy
 configure_password_policy() {
     local pam_file="/etc/pam.d/common-password"
+    local pwquality_conf="/etc/security/pwquality.conf"
     sudo apt-get install -y libpam-pwquality
     sudo sed -i '/pam_pwquality.so/d' "$pam_file"
-    echo 'password requisite pam_pwquality.so retry=3 minlen=12 ucredit=-1 lcredit=-1 dcredit=-1 ocredit=-1' \
+    echo 'password requisite pam_pwquality.so retry=3 minlen=12 ucredit=-1 lcredit=-1 dcredit=-1 ocredit=-1 enforce_for_root' \
         | sudo tee -a "$pam_file" > /dev/null
-    echo "[OK] Password policy configured: minlen=12, requires upper/lowercase, digit, special char"
+    sudo bash -c "cat > $pwquality_conf" <<EOF
+minlen = 12
+ucredit = -1
+lcredit = -1
+dcredit = -1
+ocredit = -1
+EOF
+
+    echo "[OK] Password policy configured in PAM and pwquality.conf"
+    read -r
 }
 
 # Главный цикл
