@@ -45,6 +45,10 @@ show_menu() {
     echo -e "${PURPLE}9.${NC} ${CYAN}VPS Audit${NC}"
     echo -e "${PURPLE}10.${NC} ${CYAN}Включить логгирование sudo${NC}"
     echo -e "${PURPLE}11.${NC} ${CYAN}Установить политику паролей${NC}"
+<<<<<<< HEAD
+=======
+    echo -e "${PURPLE}11.${NC} ${CYAN}Fail2Ban${NC}"
+>>>>>>> 76f0e0a562b89435d4eeeca905f8cffbb19430cd
     echo -e "${PURPLE}0.${NC} ${CYAN}Выход${NC}"
     echo ""
     echo -ne "${CYAN}Выберите пункт меню: ${NC}"
@@ -396,6 +400,43 @@ EOF
     read -r
 }
 
+<<<<<<< HEAD
+=======
+# 12. Fail2ban 
+install_fail2ban() {
+    sudo apt-get update
+    sudo apt-get install -y fail2ban
+    echo "=== Fail2ban interactive setup ==="
+    read -p "Введите максимальное число неудачных попыток (maxretry) [по умолчанию 5]: " maxretry
+    maxretry=${maxretry:-5}
+
+    read -p "Введите время блокировки в секундах (bantime) [по умолчанию 600]: " bantime
+    bantime=${bantime:-600}
+
+    read -p "Введите время окна для подсчёта попыток в секундах (findtime) [по умолчанию 300]: " findtime
+    findtime=${findtime:-300}
+
+    read -p "Введите список игнорируемых IP (через пробел) [по умолчанию 127.0.0.1/8]: " ignoreip
+    ignoreip=${ignoreip:-127.0.0.1/8}
+    local jail_file="/etc/fail2ban/jail.local"
+    sudo bash -c "cat > $jail_file" <<EOF
+[DEFAULT]
+ignoreip = $ignoreip
+bantime  = $bantime
+findtime = $findtime
+maxretry = $maxretry
+
+[sshd]
+enabled = true
+EOF
+
+    sudo systemctl enable fail2ban
+    sudo systemctl restart fail2ban
+    echo "[OK] Fail2ban установлен и настроен. Конфиг: $jail_file"
+    read -r
+}
+
+>>>>>>> 76f0e0a562b89435d4eeeca905f8cffbb19430cd
 # Главный цикл
 while true; do
     show_menu
@@ -435,6 +476,12 @@ while true; do
         11)
             configure_password_policy
             ;;
+<<<<<<< HEAD
+=======
+        12)
+            install_fail2ban
+            ;;
+>>>>>>> 76f0e0a562b89435d4eeeca905f8cffbb19430cd
         0)
             exit 0
             ;;
