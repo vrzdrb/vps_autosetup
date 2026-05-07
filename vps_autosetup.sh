@@ -43,6 +43,8 @@ show_menu() {
     echo -e "${PURPLE}7.${NC} ${CYAN}IPRegion${NC}"
     echo -e "${PURPLE}8.${NC} ${CYAN}IPQuality${NC}"
     echo -e "${PURPLE}9.${NC} ${CYAN}VPS Audit${NC}"
+    echo -e "${PURPLE}10.${NC} ${CYAN}Включить логгирование sudo${NC}"
+    echo -e "${PURPLE}11.${NC} ${CYAN}Установить политику паролей${NC}"
     echo -e "${PURPLE}0.${NC} ${CYAN}Выход${NC}"
     echo ""
     echo -ne "${CYAN}Выберите пункт меню: ${NC}"
