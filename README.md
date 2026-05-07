@@ -10,6 +10,7 @@
 - Посмотреть ipregion (by https://ipregion.vrnt.xyz);
 - Посмотреть IPQuality (by https://Check.Place);
 - Посмотреть vps-audit (by https://github.com/vernu/vps-audit).
+- Включить логгирование sudo, политику паролей, установить и настроить fail2ban
 
 ## Проверено на:
 - Debian 12+
