@@ -1,5 +1,5 @@
 # VPS autosetup
-<img width="649" height="347" alt="preview" src="https://github.com/user-attachments/assets/44679186-9798-4fe7-9b43-ce9be2ca452f" />
+<img width="652" height="446" alt="preview" src="https://github.com/user-attachments/assets/48755c3a-edfd-4e06-8e39-84903baa6640" />
 
 Скрипт позволяет быстро произвести базовую настройку VPS-сервера:
 - Установить минимальный набор программ (sudo mc ufw micro htop jq);
