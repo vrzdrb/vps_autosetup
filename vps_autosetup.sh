@@ -365,14 +365,12 @@ run_vps_audit() {
 # 10. sudo logging
 enable_sudo_logging() {
     local sudoers_file="/etc/sudoers"
-    local custom_sudoers="/etc/sudoers.d/logging"
-    echo "Defaults logfile=\"/var/log/sudo.log\"" | sudo tee "$custom_sudoers" > /dev/null
-    sudo visudo -cf "$custom_sudoers"
-    if [ $? -eq 0 ]; then
+    sudo sed -i '/Defaults logfile/d' "$sudoers_file"
+    echo 'Defaults logfile="/var/log/sudo.log"' | sudo tee -a "$sudoers_file" > /dev/null
+    if sudo visudo -cf "$sudoers_file"; then
         echo "[OK] Sudo logging enabled. Logs will be in /var/log/sudo.log"
     else
         echo "[ERROR] Failed to configure sudo logging"
-        sudo rm -f "$custom_sudoers"
     fi
 }
 
@@ -381,8 +379,8 @@ configure_password_policy() {
     local pam_file="/etc/pam.d/common-password"
     sudo apt-get install -y libpam-pwquality
     sudo sed -i '/pam_pwquality.so/d' "$pam_file"
-    echo "password requisite pam_pwquality.so retry=3 minlen=12 ucredit=-1 lcredit=-1 dcredit=-1 ocredit=-1" | \
-        sudo tee -a "$pam_file" > /dev/null
+    echo 'password requisite pam_pwquality.so retry=3 minlen=12 ucredit=-1 lcredit=-1 dcredit=-1 ocredit=-1' \
+        | sudo tee -a "$pam_file" > /dev/null
     echo "[OK] Password policy configured: minlen=12, requires upper/lowercase, digit, special char"
 }
 
@@ -426,7 +424,6 @@ while true; do
             configure_password_policy
             ;;
         0)
-            echo -e "${GREEN}Хуй в ладошку - и в дорожку!${NC}"
             exit 0
             ;;
         *)
