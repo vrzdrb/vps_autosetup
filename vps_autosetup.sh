@@ -43,6 +43,8 @@ show_menu() {
     echo -e "${PURPLE}7.${NC} ${CYAN}IPRegion${NC}"
     echo -e "${PURPLE}8.${NC} ${CYAN}IPQuality${NC}"
     echo -e "${PURPLE}9.${NC} ${CYAN}VPS Audit${NC}"
+    echo -e "${PURPLE}10.${NC} ${CYAN}Включить логгирование sudo${NC}"
+    echo -e "${PURPLE}11.${NC} ${CYAN}Установить политику паролей${NC}"
     echo -e "${PURPLE}0.${NC} ${CYAN}Выход${NC}"
     echo ""
     echo -ne "${CYAN}Выберите пункт меню: ${NC}"
@@ -68,7 +70,7 @@ EOF
     systemctl restart systemd-resolved.service
 
     echo -e "${CYAN}Установка дополнительных пакетов...${NC}"
-    apt install unattended-upgrades sudo mc ufw chkrootkit micro htop tcpdump net-tools dnsutils jq iftop nethogs bmon -y
+    apt install unattended-upgrades sudo mc ufw micro htop jq -y
     echo 'Unattended-Upgrade::Mail "root";' >> /etc/apt/apt.conf.d/50unattended-upgrades
     echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true | debconf-set-selections
     dpkg-reconfigure -f noninteractive unattended-upgrades
@@ -358,6 +360,42 @@ run_vps_audit() {
     read -r
 }
 
+#!/bin/bash
+
+# 10. sudo logging
+enable_sudo_logging() {
+    local sudoers_file="/etc/sudoers"
+    sudo sed -i '/Defaults logfile/d' "$sudoers_file"
+    echo 'Defaults logfile="/var/log/sudo.log"' | sudo tee -a "$sudoers_file" > /dev/null
+    if sudo visudo -cf "$sudoers_file"; then
+        echo "[OK] Sudo logging enabled. Logs will be in /var/log/sudo.log"
+        read -r
+    else
+        echo "[ERROR] Failed to configure sudo logging"
+        read -r
+    fi
+}
+
+# 11. Password policy
+configure_password_policy() {
+    local pam_file="/etc/pam.d/common-password"
+    local pwquality_conf="/etc/security/pwquality.conf"
+    sudo apt-get install -y libpam-pwquality
+    sudo sed -i '/pam_pwquality.so/d' "$pam_file"
+    echo 'password requisite pam_pwquality.so retry=3 minlen=12 ucredit=-1 lcredit=-1 dcredit=-1 ocredit=-1 enforce_for_root' \
+        | sudo tee -a "$pam_file" > /dev/null
+    sudo bash -c "cat > $pwquality_conf" <<EOF
+minlen = 12
+ucredit = -1
+lcredit = -1
+dcredit = -1
+ocredit = -1
+EOF
+
+    echo "[OK] Password policy configured in PAM and pwquality.conf"
+    read -r
+}
+
 # Главный цикл
 while true; do
     show_menu
@@ -391,8 +429,13 @@ while true; do
         9)
             run_vps_audit
             ;;
+        10)
+            enable_sudo_logging
+            ;;
+        11)
+            configure_password_policy
+            ;;
         0)
-            echo -e "${GREEN}Хуй в ладошку - и в дорожку!${NC}"
             exit 0
             ;;
         *)
@@ -401,3 +444,4 @@ while true; do
             ;;
     esac
 done
+
