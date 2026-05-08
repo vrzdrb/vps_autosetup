@@ -397,8 +397,6 @@ EOF
     read -r
 }
 
-<<<<<<< HEAD
-=======
 # 12. Fail2ban 
 install_fail2ban() {
     sudo apt-get update
@@ -433,7 +431,6 @@ EOF
     read -r
 }
 
->>>>>>> 76f0e0a562b89435d4eeeca905f8cffbb19430cd
 # Главный цикл
 while true; do
     show_menu
