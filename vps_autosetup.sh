@@ -45,10 +45,7 @@ show_menu() {
     echo -e "${PURPLE}9.${NC} ${CYAN}VPS Audit${NC}"
     echo -e "${PURPLE}10.${NC} ${CYAN}Включить логгирование sudo${NC}"
     echo -e "${PURPLE}11.${NC} ${CYAN}Установить политику паролей${NC}"
-<<<<<<< HEAD
-=======
-    echo -e "${PURPLE}11.${NC} ${CYAN}Fail2Ban${NC}"
->>>>>>> 76f0e0a562b89435d4eeeca905f8cffbb19430cd
+    echo -e "${PURPLE}12.${NC} ${CYAN}Fail2Ban${NC}"
     echo -e "${PURPLE}0.${NC} ${CYAN}Выход${NC}"
     echo ""
     echo -ne "${CYAN}Выберите пункт меню: ${NC}"
@@ -476,12 +473,9 @@ while true; do
         11)
             configure_password_policy
             ;;
-<<<<<<< HEAD
-=======
         12)
             install_fail2ban
             ;;
->>>>>>> 76f0e0a562b89435d4eeeca905f8cffbb19430cd
         0)
             exit 0
             ;;
