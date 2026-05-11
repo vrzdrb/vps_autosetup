@@ -404,6 +404,7 @@ dcredit = -1
 ocredit = -1
 EOF
 
+    pam-auth-update
     echo "[OK] Password policy configured in PAM and pwquality.conf"
     read -r
 }
