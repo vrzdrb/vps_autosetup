@@ -42,10 +42,11 @@ show_menu() {
     echo -e "${PURPLE}6.${NC} ${CYAN}Добавить подкачку${NC}"
     echo -e "${PURPLE}7.${NC} ${CYAN}IPRegion${NC}"
     echo -e "${PURPLE}8.${NC} ${CYAN}IPQuality${NC}"
-    echo -e "${PURPLE}9.${NC} ${CYAN}VPS Audit${NC}"
-    echo -e "${PURPLE}10.${NC} ${CYAN}Включить логгирование sudo${NC}"
-    echo -e "${PURPLE}11.${NC} ${CYAN}Установить политику паролей${NC}"
-    echo -e "${PURPLE}12.${NC} ${CYAN}Fail2Ban${NC}"
+    echo -e "${PURPLE}9.${NC} ${CYAN}bench.sh${NC}"
+    echo -e "${PURPLE}10.${NC} ${CYAN}VPS Audit${NC}"
+    echo -e "${PURPLE}11.${NC} ${CYAN}Включить логгирование sudo${NC}"
+    echo -e "${PURPLE}12.${NC} ${CYAN}Установить политику паролей${NC}"
+    echo -e "${PURPLE}13.${NC} ${CYAN}Fail2Ban${NC}"
     echo -e "${PURPLE}0.${NC} ${CYAN}Выход${NC}"
     echo ""
     echo -ne "${CYAN}Выберите пункт меню: ${NC}"
@@ -349,7 +350,17 @@ run_ipquality() {
     read -r
 }
 
-# 9. VPS Audit
+# 9. bench.sh
+run_bench() {
+    echo -e "${CYAN}Запуск bench.sh...${NC}"
+    
+    curl -Lso- bench.sh | bash
+    
+    echo -e "${YELLOW}Нажмите Enter для возврата в меню...${NC}"
+    read -r
+}
+
+# 10. VPS Audit
 run_vps_audit() {
     echo -e "${CYAN}Запуск VPS Audit...${NC}"
     
@@ -363,7 +374,7 @@ run_vps_audit() {
 
 #!/bin/bash
 
-# 10. sudo logging
+# 11. sudo logging
 enable_sudo_logging() {
     local sudoers_file="/etc/sudoers"
     sudo sed -i '/Defaults logfile/d' "$sudoers_file"
@@ -377,7 +388,7 @@ enable_sudo_logging() {
     fi
 }
 
-# 11. Password policy
+# 12. Password policy
 configure_password_policy() {
     local pam_file="/etc/pam.d/common-password"
     local pwquality_conf="/etc/security/pwquality.conf"
@@ -397,7 +408,7 @@ EOF
     read -r
 }
 
-# 12. Fail2ban 
+# 13. Fail2ban 
 install_fail2ban() {
     sudo apt-get update
     sudo apt-get install -y fail2ban
@@ -462,15 +473,18 @@ while true; do
             run_ipquality
             ;;
         9)
-            run_vps_audit
+            run_bench
             ;;
         10)
-            enable_sudo_logging
+            run_vps_audit
             ;;
         11)
-            configure_password_policy
+            enable_sudo_logging
             ;;
         12)
+            configure_password_policy
+            ;;
+        13)
             install_fail2ban
             ;;
         0)
